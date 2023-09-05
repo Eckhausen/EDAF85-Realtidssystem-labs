@@ -14,11 +14,13 @@ public class ClockMain {
         out.displayTime(15, 2, 37);   // arbitrary time: just an example
 
         while (true) {
+            in.getSemaphore().acquire();
             UserInput userInput = in.getUserInput();
             Choice c = userInput.choice();
             int h = userInput.hours();
             int m = userInput.minutes();
             int s = userInput.seconds();
+            in.getSemaphore().release();
 
             System.out.println("choice=" + c + " h=" + h + " m=" + m + " s=" + s);
         }
