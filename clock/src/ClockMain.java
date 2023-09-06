@@ -20,7 +20,7 @@ public class ClockMain {
             int h = userInput.hours();
             int m = userInput.minutes();
             int s = userInput.seconds();
-            in.getSemaphore().release();
+            //in.getSemaphore().release();
 
             System.out.println("choice=" + c + " h=" + h + " m=" + m + " s=" + s);
         }
