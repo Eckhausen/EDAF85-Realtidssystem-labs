@@ -15,8 +15,8 @@ public class ClockMain {
         ClockInput  in  = emulator.getInput();
         ClockOutput out = emulator.getOutput();
 
-        ClockTime klockan = new ClockTime(out,hrs,min,sec);
-        klockan.start();
+        ClockTime clock = new ClockTime(out,hrs,min,sec);
+        clock.start();
 
         //out.displayTime(15, 2, 37);   // arbitrary time: just an example
 

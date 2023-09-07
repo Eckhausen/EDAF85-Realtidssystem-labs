@@ -18,7 +18,6 @@ public class ClockTime extends Thread {
     @Override
     public void run() {
         t0 = System.currentTimeMillis();
-
         while(true){
             t = System.currentTimeMillis();
             if(t-t0 >= 1000){
