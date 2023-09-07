@@ -4,6 +4,8 @@ public class ClockTime extends Thread {
     private long t0, t;
     private ClockOutput out;
     private Monitor monitor;
+    private int alarmCounter = 0;
+    private boolean alarmSounding = false;
 
 
     public ClockTime(ClockOutput out, Monitor monitor){
@@ -20,9 +22,18 @@ public class ClockTime extends Thread {
                 monitor.tickTime();
                 int[] currentTime = monitor.getTime();
                 out.displayTime(currentTime[0], currentTime[1], currentTime[2]);
+
+                if (monitor.checkAlarm() || (alarmSounding && alarmCounter < 20)){
+                    alarmSounding = true;
+                    out.alarm();
+                    alarmCounter++;
+                } else {
+                    alarmSounding = false;
+                    alarmCounter = 0;
+                }
                 t0 = t;
+                }
+
             }
         }
-
     }
-}

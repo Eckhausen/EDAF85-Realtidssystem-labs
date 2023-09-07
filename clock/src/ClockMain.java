@@ -26,7 +26,9 @@ public class ClockMain {
             } else if (c == Choice.SET_ALARM) {
                 monitor.setAlarmTime(h,m,s);
             } else if (c == Choice.TOGGLE_ALARM) {
-                monitor.armAlarm(); //Inte impl.
+                monitor.toggleAlarm();
+                boolean isAlarmEnabled = monitor.isAlarmEnabled();
+                out.setAlarmIndicator(isAlarmEnabled);
             }
             System.out.println("choice=" + c + " h=" + h + " m=" + m + " s=" + s);
         }
