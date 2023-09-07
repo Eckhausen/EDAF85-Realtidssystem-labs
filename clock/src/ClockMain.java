@@ -1,9 +1,6 @@
 import clock.AlarmClockEmulator;
-import clock.io.Choice;
-import clock.io.ClockInput;
+import clock.io.*;
 import clock.io.ClockInput.UserInput;
-import clock.io.ClockOutput;
-import clock.io.ClockTime;
 
 public class ClockMain {
     public static void main(String[] args) throws InterruptedException {
@@ -14,7 +11,7 @@ public class ClockMain {
 
         ClockInput  in  = emulator.getInput();
         ClockOutput out = emulator.getOutput();
-
+        Monitor monitor = new Monitor();
         ClockTime clock = new ClockTime(out,hrs,min,sec);
         clock.start();
 
@@ -27,8 +24,13 @@ public class ClockMain {
             int h = userInput.hours();
             int m = userInput.minutes();
             int s = userInput.seconds();
-            //in.getSemaphore().release();
-
+            if(c == Choice.SET_TIME){
+                monitor.setTime(h,m,s);
+            } else if (c == Choice.SET_ALARM) {
+                monitor.setAlarmTime(h,m,s);
+            } else if (c == Choice.TOGGLE_ALARM) {
+                monitor.armAlarm();
+            }
             System.out.println("choice=" + c + " h=" + h + " m=" + m + " s=" + s);
         }
     }
