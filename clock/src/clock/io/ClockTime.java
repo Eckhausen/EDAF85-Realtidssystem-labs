@@ -35,7 +35,6 @@ public class ClockTime extends Thread {
                 }
                 t0 = t;
                 out.displayTime(hrs, min, sec);
-                //t0 = t;
             }
         }
 
