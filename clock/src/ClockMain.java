@@ -4,15 +4,12 @@ import clock.io.ClockInput.UserInput;
 
 public class ClockMain {
     public static void main(String[] args) throws InterruptedException {
-        int hrs = 23;
-        int min = 59;
-        int sec = 30;
         AlarmClockEmulator emulator = new AlarmClockEmulator();
 
         ClockInput  in  = emulator.getInput();
         ClockOutput out = emulator.getOutput();
         Monitor monitor = new Monitor();
-        ClockTime clock = new ClockTime(out,hrs,min,sec);
+        ClockTime clock = new ClockTime(out, monitor);
         clock.start();
 
         //out.displayTime(15, 2, 37);   // arbitrary time: just an example
@@ -29,7 +26,7 @@ public class ClockMain {
             } else if (c == Choice.SET_ALARM) {
                 monitor.setAlarmTime(h,m,s);
             } else if (c == Choice.TOGGLE_ALARM) {
-                monitor.armAlarm();
+                monitor.armAlarm(); //Inte impl.
             }
             System.out.println("choice=" + c + " h=" + h + " m=" + m + " s=" + s);
         }

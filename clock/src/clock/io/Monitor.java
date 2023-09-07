@@ -38,7 +38,18 @@ public class Monitor {
     public void tickTime()  {
         try {
             mutex.acquire();
-
+            sec++;
+            if(sec >= 60){
+                sec = 0;
+                min++;
+            }
+            if(min >= 60){
+                min = 0;
+                hrs++;
+            }
+            if(hrs >= 24){
+                hrs = 0;
+            }
             mutex.release();
             } catch(Exception e){
                 e.printStackTrace();
@@ -51,7 +62,9 @@ public class Monitor {
     }
 
     public void setAlarmTime(int hrs, int min, int sec){
-
+        this.ah = hrs;
+        this.am = min;
+        this.as = sec;
     }
 
     public void armAlarm(){
