@@ -24,10 +24,12 @@ public class ClockTime extends Thread {
                 out.displayTime(currentTime[0], currentTime[1], currentTime[2]);
 
                 if (monitor.checkAlarm() || (alarmSounding && alarmCounter < 20)){
+                    //Kollar om larmet är triggat, sen fortsätter den tills den räknat till 20.
                     alarmSounding = true;
                     out.alarm();
                     alarmCounter++;
                 } else {
+                    //efter 20 signaler så resetar vi allt.
                     alarmSounding = false;
                     alarmCounter = 0;
                 }

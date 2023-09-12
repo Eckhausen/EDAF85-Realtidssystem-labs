@@ -14,11 +14,18 @@ public class Monitor {
     }
 
     public int[] getTime(){
-        int[] time = new int[3];
-        time[0] = hrs;
-        time[1] = min;
-        time[2] = sec;
-        return time;
+        try{
+            mutex.acquire();
+            int[] time = new int[3];
+            time[0] = hrs;
+            time[1] = min;
+            time[2] = sec;
+            mutex.release();
+            return time;
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void setTime(int hrs, int min, int sec) {
@@ -68,6 +75,15 @@ public class Monitor {
     }
 
     public boolean isAlarmEnabled(){
+        try{
+            mutex.acquire();
+            return alarmEnabled;
+
+        } catch (Exception e){
+            e.printStackTrace();
+        } finally {
+            mutex.release();
+        }
         return alarmEnabled;
     }
     public void toggleAlarm(){
