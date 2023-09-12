@@ -5,7 +5,6 @@ import java.util.concurrent.Semaphore;
 public class Monitor {
     private int hrs, min, sec;
     private int alarmHrs, alarmMin, alarmSec;
-    private int alarmDuration = 20;
     private Semaphore mutex = new Semaphore(1);
     private boolean alarmEnabled = false;
 
