@@ -8,6 +8,10 @@ public class LiftMonitor {
     private boolean doorsOpen = false;
     private int[] toEnter;
     private int[] toExit;
+    private boolean isMoving = false;
+    private enum direction{
+        UP, DOWN;
+    }
 
     public LiftMonitor(int maxFloors, int maxPassengers){
         this.maxFloors = maxFloors;
@@ -19,4 +23,5 @@ public class LiftMonitor {
         toEnter = new int[maxFloors];
         toExit = new int[maxFloors];
     }
+
 }
