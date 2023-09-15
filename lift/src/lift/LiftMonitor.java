@@ -1,10 +1,7 @@
 package lift;
 
 public class LiftMonitor {
-    private int maxFloors;
-    private int maxPassengers;
-    private int currentAmountPassengers;
-    private int currentFloor;
+    private int maxFloors, maxPassengers, currentAmountPassengers, currentFloor;
     private boolean doorsOpen = false;
     private int[] toEnter;
     private int[] toExit;
@@ -23,5 +20,18 @@ public class LiftMonitor {
         toEnter = new int[maxFloors];
         toExit = new int[maxFloors];
     }
+    public int getCurrentFloor(){
+        return currentFloor;
+    }
+
+    public int getFromFloor(){
+        return toEnter[0];
+    }
+    public int getNextFloor(){
+        return toExit[0];
+    }
+
+
+
 
 }
