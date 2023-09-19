@@ -10,6 +10,12 @@ public class Lift extends Thread{
     }
     public void run(){
         while(true){
+            try {
+                wait();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             currentFloor = monitor.getCurrentFloor();
             fromFloor = monitor.getFromFloor();
             nextFloor = monitor.getNextFloor();
