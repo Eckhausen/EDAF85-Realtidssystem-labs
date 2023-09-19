@@ -1,7 +1,7 @@
 package lift;
 
 public class LiftMonitor {
-    private int maxFloors, maxPassengers, currentPassengerCount, currentFloor;
+    private int maxFloors, maxPassengers, currentPassengerCount, currentFloor, nextFloor;
     private boolean doorsOpen = false;
     private int[] toEnter;
     private int[] toExit;
@@ -27,11 +27,19 @@ public class LiftMonitor {
         return currentFloor;
     }
 
-    synchronized int getFromFloor(){
-        return toEnter[0];
+    synchronized boolean paxOnFloor(){
+        if (toEnter[currentFloor] != 0){
+            return true;
+        }
+        return false;
     }
     synchronized int getNextFloor(){
-        return toExit[0];
+        if(currentDirection == Direction.UP){
+            nextFloor = currentFloor++;
+        } else {
+            nextFloor = currentFloor--;
+        }
+        return nextFloor;
     }
 
     synchronized void changeDirection(){
@@ -48,4 +56,5 @@ public class LiftMonitor {
             e.printStackTrace();
         }
     }
+
 }
