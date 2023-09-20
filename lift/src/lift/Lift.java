@@ -11,10 +11,10 @@ public class Lift extends Thread{
     public void run(){
         while(true){
             try {
-                if (monitor.paxOnFloor() && monitor.hasSpaceForMorePassengers()){
+                while (monitor.paxOnFloor() && monitor.hasSpaceForMorePassengers()){
                     //Om det finns pax på våningen OCH nuvarande passagerarantal är mindre än maxantalet.
                     monitor.openDoors();
-                    monitor.wait();
+                    monitor.waitForPax();
                 }
                 if (!monitor.paxOnFloor() || !monitor.hasSpaceForMorePassengers()){
                     monitor.closeDoors();
