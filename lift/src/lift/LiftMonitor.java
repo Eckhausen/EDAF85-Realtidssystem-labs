@@ -27,20 +27,23 @@ public class LiftMonitor {
         return currentFloor;
     }
 
-    synchronized boolean paxOnFloor(){
-        if (toEnter[currentFloor] != 0){
+    synchronized boolean paxOnFloor() {
+        if (toEnter[currentFloor] > 0 || toExit[currentFloor] > 0) {
             return true;
         }
         return false;
     }
+
     synchronized int getNextFloor(){
-        if(currentDirection == Direction.UP){
-            nextFloor = currentFloor++;
+        if(currentDirection == Direction.UP && currentFloor != maxFloors - 1){
+            nextFloor = currentFloor + 1;
         } else {
-            nextFloor = currentFloor--;
+            nextFloor = currentFloor - 1;
         }
         return nextFloor;
     }
+
+
 
     synchronized void changeDirection(){
         if(currentFloor == maxFloors - 1){
@@ -49,12 +52,53 @@ public class LiftMonitor {
             currentDirection = Direction.UP;
         }
     }
-    synchronized void standby(){
-        try{
-            wait();
-        } catch (Exception e){
-            e.printStackTrace();
+
+    synchronized boolean isDoorsOpen(){
+        return doorsOpen;
+    }
+
+    synchronized void incPax(int startFloor){
+        toEnter[startFloor]++;
+    }
+    synchronized void decPax(int startFloor){
+        toEnter[startFloor]--;
+    }
+
+    synchronized void waitForLift(int startFloor) {
+        while(currentFloor != startFloor || !doorsOpen){
+            try {
+                wait();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
+    synchronized void waitToExitLift(int destinationFloor){
+
+    }
+
+    synchronized void openDoors() {
+        doorsOpen = true;
+        liftView.openDoors(currentFloor);
+        notifyAll(); // Informera alla väntande passagerare att dörrarna är öppna
+    }
+
+    synchronized void closeDoors() {
+        if (doorsOpen) {  // Endast stäng dörrarna om de är öppna
+            doorsOpen = false;
+            liftView.closeDoors();
+        }
+    }
+
+
+    synchronized boolean hasSpaceForMorePassengers() {
+        return currentPassengerCount < maxPassengers;
+    }
+
+    synchronized void updateCurrentFloor(){
+        currentFloor = nextFloor;
+        notifyAll();
+    }
+
 
 }

@@ -11,11 +11,18 @@ public class Lift extends Thread{
     public void run(){
         while(true){
             try {
-                if (monitor.paxOnFloor()){
-                    liftView.openDoors(monitor.getCurrentFloor());
+                if (monitor.paxOnFloor() && monitor.hasSpaceForMorePassengers()){
+                    //Om det finns pax på våningen OCH nuvarande passagerarantal är mindre än maxantalet.
+                    monitor.openDoors();
                     monitor.wait();
                 }
+                if (!monitor.paxOnFloor() || !monitor.hasSpaceForMorePassengers()){
+                    monitor.closeDoors();
+                }
                 liftView.moveLift(monitor.getCurrentFloor(), monitor.getNextFloor());
+                monitor.updateCurrentFloor();
+                //Uppdatera currentFloor
+                monitor.notifyAll();
             } catch (Exception e) {
                 e.printStackTrace();
             }
