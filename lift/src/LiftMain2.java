@@ -13,8 +13,6 @@ public class LiftMain2 extends Thread {
             passengerThread.start();
         }
         liftThread.start();
-        //int  fromFloor = pass.getStartFloor();
-        //int    toFloor = pass.getDestinationFloor();
     }
 
 }
