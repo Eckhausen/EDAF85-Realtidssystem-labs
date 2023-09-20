@@ -35,6 +35,7 @@ public class LiftMonitor {
     }
 
     synchronized int getNextFloor(){
+        changeDirection();
         if(currentDirection == Direction.UP && currentFloor != maxFloors - 1){
             nextFloor = currentFloor + 1;
         } else {
@@ -73,14 +74,17 @@ public class LiftMonitor {
             }
         }
     }
-    synchronized void waitToExitLift(int destinationFloor){
+    synchronized void waitForPax(){
 
     }
 
     synchronized void openDoors() {
-        doorsOpen = true;
-        liftView.openDoors(currentFloor);
-        notifyAll(); // Informera alla väntande passagerare att dörrarna är öppna
+        if(!doorsOpen){
+            doorsOpen = true;
+            liftView.openDoors(currentFloor);
+            notifyAll(); // Informera alla väntande passagerare att dörrarna är öppna
+        }
+
     }
 
     synchronized void closeDoors() {
