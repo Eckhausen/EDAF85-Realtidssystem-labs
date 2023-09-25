@@ -75,6 +75,26 @@ public class LiftMonitor {
         }
     }
     synchronized void waitForPax(){
+        while(toEnter[currentFloor] > 0 && hasSpaceForMorePassengers()){
+            try{
+                openDoors();
+                wait();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        closeDoors();
+    }
+
+    synchronized void waitToExit(int destinationFloor){
+        try{
+            while (currentFloor != destinationFloor || !doorsOpen){
+                wait();
+            }
+            liftView.closeDoors();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
     }
 
