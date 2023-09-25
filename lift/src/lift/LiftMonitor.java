@@ -60,9 +60,11 @@ public class LiftMonitor {
 
     synchronized void incPax(int startFloor){
         toEnter[startFloor]++;
+        liftView.showDebugInfo(toEnter, toExit);
     }
     synchronized void decPax(int startFloor){
         toEnter[startFloor]--;
+        liftView.showDebugInfo(toEnter, toExit);
         currentPassengerCount++;
         notifyAll();
     }
