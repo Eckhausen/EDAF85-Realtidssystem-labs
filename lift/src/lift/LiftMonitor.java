@@ -63,6 +63,8 @@ public class LiftMonitor {
     }
     synchronized void decPax(int startFloor){
         toEnter[startFloor]--;
+        currentPassengerCount++;
+        notifyAll();
     }
 
     synchronized void waitForLift(int startFloor) {
@@ -95,7 +97,7 @@ public class LiftMonitor {
         } catch (Exception e){
             e.printStackTrace();
         }
-
+    currentPassengerCount--;
     }
 
     synchronized void openDoors() {

@@ -12,14 +12,8 @@ public class Lift extends Thread{
         while(true){
             try {
                 monitor.waitForPax();
-
-                if (!monitor.paxOnFloor() || !monitor.hasSpaceForMorePassengers()){
-                    monitor.closeDoors();
-                }
                 liftView.moveLift(monitor.getCurrentFloor(), monitor.getNextFloor());
                 monitor.updateCurrentFloor();
-                //Uppdatera currentFloor
-
             } catch (Exception e) {
                 e.printStackTrace();
             }
