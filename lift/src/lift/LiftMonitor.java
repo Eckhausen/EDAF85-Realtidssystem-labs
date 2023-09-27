@@ -1,7 +1,7 @@
 package lift;
 
 public class LiftMonitor {
-    private int maxFloors, maxPassengers, currentPassengerCount, currentFloor, nextFloor;
+    private int maxFloors, maxPassengers, currentPassengerCount, currentFloor, nextFloor, passengerEntering, passengerExiting;
     private boolean doorsOpen = false;
     private int[] toEnter;
     private int[] toExit;
@@ -22,16 +22,18 @@ public class LiftMonitor {
         toExit = new int[maxFloors];
         currentDirection = Direction.UP;
         isMoving = false;
+        this.passengerEntering = 0;
+        this.passengerExiting = 0;
+    }
+    synchronized void  addPaxWaiting(int startFloor){
+        this.toEnter[startFloor]++;
+        notifyAll();
     }
     synchronized int getCurrentFloor(){
         return currentFloor;
     }
-
-    synchronized boolean paxOnFloor() {
-        if (toEnter[currentFloor] > 0 || toExit[currentFloor] > 0) {
-            return true;
-        }
-        return false;
+    synchronized void updateCurrentFloor(int nextFloor){
+        currentFloor = nextFloor;
     }
 
     synchronized int getNextFloor(){
@@ -43,9 +45,6 @@ public class LiftMonitor {
         }
         return nextFloor;
     }
-
-
-
     synchronized void changeDirection(){
         if(currentFloor == maxFloors - 1){
             currentDirection = Direction.DOWN;
@@ -53,62 +52,95 @@ public class LiftMonitor {
             currentDirection = Direction.UP;
         }
     }
-
-    synchronized boolean isDoorsOpen(){
-        return doorsOpen;
-    }
-
-    synchronized void incPax(int startFloor){
-        toEnter[startFloor]++;
-        liftView.showDebugInfo(toEnter, toExit);
-    }
-    synchronized void decPax(int startFloor){
-        toEnter[startFloor]--;
-        liftView.showDebugInfo(toEnter, toExit);
+    synchronized void addPax(int destination){
         currentPassengerCount++;
+        passengerEntering--;
+        toExit[destination]++;
+        toEnter[currentFloor]++;
+        liftView.showDebugInfo(toEnter, toExit);
+        notifyAll();
+    }
+    synchronized void removePax(){
+        currentPassengerCount--;
+        passengerExiting--;
+        toExit[currentFloor]--;
+        liftView.showDebugInfo(toEnter, toExit);
         notifyAll();
     }
 
-    synchronized void waitForLift(int startFloor) {
-        while(currentFloor != startFloor || !doorsOpen){
-            try {
-                wait();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-    synchronized void waitForPax(){
-        while(toEnter[currentFloor] > 0 && hasSpaceForMorePassengers()){
+    synchronized void waitToEnterLift(int startFloor) {
+        while(!doorsOpen ||
+                currentFloor != startFloor ||
+                (currentPassengerCount + passengerEntering - passengerExiting) == maxPassengers){
             try{
-                openDoors();
                 wait();
             } catch (Exception e){
                 e.printStackTrace();
             }
         }
-        closeDoors();
+        passengerEntering++;
     }
-
-    synchronized void waitToExit(int destinationFloor){
-        try{
-            while (currentFloor != destinationFloor || !doorsOpen){
+    synchronized void waitToExitLift(int destination){
+        while(currentFloor != destination || !doorsOpen){
+            try{
                 wait();
+            } catch (Exception e){
+                e.printStackTrace();
             }
-            liftView.closeDoors();
-        } catch (Exception e){
-            e.printStackTrace();
         }
-    currentPassengerCount--;
+        passengerExiting++;
+        notifyAll();
     }
 
+    synchronized void allowPassengersInOut(){
+        while(((toEnter[currentFloor] > 0) && currentPassengerCount != maxPassengers) ||
+                (toExit[currentFloor] > 0) ||
+                (passengerEntering > 0)){
+            notifyAll();
+            try{
+                if(!doorsOpen){
+                    liftView.openDoors(currentFloor);
+                    toggleDoors();
+                }
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+        if(doorsOpen){
+            liftView.closeDoors();
+            toggleDoors();
+        }
+    }
+
+    private void toggleDoors() {
+        doorsOpen = !doorsOpen;
+    }
+
+    synchronized void waitForPax(){
+        while(!passengerWaiting() && currentPassengerCount == 0){
+            try{
+                wait();
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private boolean passengerWaiting(){
+        for(int i=0; i<maxFloors; i++){
+            if(toEnter[i] > 0){
+                return true;
+            }
+        }
+        return false;
+    }
     synchronized void openDoors() {
         if(!doorsOpen){
             doorsOpen = true;
             liftView.openDoors(currentFloor);
             notifyAll(); // Informera alla väntande passagerare att dörrarna är öppna
         }
-
     }
 
     synchronized void closeDoors() {
@@ -123,10 +155,7 @@ public class LiftMonitor {
         return currentPassengerCount < maxPassengers;
     }
 
-    synchronized void updateCurrentFloor(){
-        currentFloor = nextFloor;
-        notifyAll();
-    }
+
 
 
 }

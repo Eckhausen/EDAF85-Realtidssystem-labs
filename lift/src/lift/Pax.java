@@ -13,13 +13,18 @@ public class Pax extends Thread{
         this.monitor = monitor;
     }
     public void run(){
+        //Starta och gå till hiss.
         passenger.begin();
-        monitor.incPax(startFloor);
-        monitor.waitForLift(startFloor);
+        monitor.addPaxWaiting(startFloor);
+        monitor.waitToEnterLift(startFloor);
+        //Gå in i hiss.
         passenger.enterLift();
-        monitor.decPax(startFloor);
-        monitor.waitToExit(destinationFloor);
+        monitor.addPax(destinationFloor);
+        //Gå ut ur hiss.
+        monitor.waitToExitLift(destinationFloor);
         passenger.exitLift();
+        monitor.removePax();
+
         passenger.end();
     }
 }
