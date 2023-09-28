@@ -56,7 +56,7 @@ public class LiftMonitor {
         currentPassengerCount++;
         passengerEntering--;
         toExit[destination]++;
-        toEnter[currentFloor]++;
+        toEnter[currentFloor]--;
         liftView.showDebugInfo(toEnter, toExit);
         notifyAll();
     }
@@ -96,12 +96,14 @@ public class LiftMonitor {
         while(((toEnter[currentFloor] > 0) && currentPassengerCount != maxPassengers) ||
                 (toExit[currentFloor] > 0) ||
                 (passengerEntering > 0)){
+
             notifyAll();
             try{
                 if(!doorsOpen){
                     liftView.openDoors(currentFloor);
                     toggleDoors();
                 }
+                wait();
             } catch (Exception e){
                 e.printStackTrace();
             }
@@ -135,25 +137,7 @@ public class LiftMonitor {
         }
         return false;
     }
-    synchronized void openDoors() {
-        if(!doorsOpen){
-            doorsOpen = true;
-            liftView.openDoors(currentFloor);
-            notifyAll(); // Informera alla väntande passagerare att dörrarna är öppna
-        }
-    }
 
-    synchronized void closeDoors() {
-        if (doorsOpen) {  // Endast stäng dörrarna om de är öppna
-            doorsOpen = false;
-            liftView.closeDoors();
-        }
-    }
-
-
-    synchronized boolean hasSpaceForMorePassengers() {
-        return currentPassengerCount < maxPassengers;
-    }
 
 
 
