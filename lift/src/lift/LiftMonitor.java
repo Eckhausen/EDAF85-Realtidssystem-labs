@@ -3,9 +3,7 @@ package lift;
 public class LiftMonitor {
     private int maxFloors, maxPassengers, currentPassengerCount, currentFloor, nextFloor, passengerEntering, passengerExiting;
     private boolean doorsOpen = false;
-    private int[] toEnter;
-    private int[] toExit;
-    private boolean isMoving;
+    private int[] toEnter, toExit;
     private enum Direction{UP, DOWN}
     private Direction currentDirection;
     private LiftView liftView;
@@ -21,7 +19,6 @@ public class LiftMonitor {
         toEnter = new int[maxFloors];
         toExit = new int[maxFloors];
         currentDirection = Direction.UP;
-        isMoving = false;
         this.passengerEntering = 0;
         this.passengerExiting = 0;
     }
