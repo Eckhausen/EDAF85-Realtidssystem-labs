@@ -3,6 +3,8 @@ package wash.control;
 import wash.io.WashingIO;
 import wash.simulation.WashingSimulator;
 
+import static wash.control.WashingMessage.Order.*;
+
 public class Wash {
 
     public static void main(String[] args) throws InterruptedException {
@@ -21,7 +23,30 @@ public class Wash {
         while (true) {
             int n = io.awaitButton();
             System.out.println("user selected program " + n);
+            switch (n){
+                case 0:
+                    //TODO Något knas här, kopierat från prog 3 error handling
+                    temp.send(new WashingMessage(this, TEMP_IDLE));
+                    water.send(new WashingMessage(this, WATER_IDLE));
+                    spin.send(new WashingMessage(this, SPIN_OFF));
 
+                    temp.interrupt();
+                    water.interrupt();
+                    spin.interrupt();
+
+                    System.out.println("washing program terminated");
+                    break;
+                case 1:
+                    //Prog 1
+                    break;
+                case 2:
+                    //Prog 2
+                    break;
+                case 3:
+                    WashingProgram3 washingProgram3 = new WashingProgram3(io, temp, water, spin);
+                    washingProgram3.start();
+                    break;
+            }
             // TODO:
             // if the user presses buttons 1-3, start a washing program
             // if the user presses button 0, and a program has been started, stop it
