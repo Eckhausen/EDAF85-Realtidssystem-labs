@@ -7,9 +7,12 @@ import wash.io.WashingIO.Spin;
 public class SpinController extends ActorThread<WashingMessage> {
 
     // TODO: add attributes
+    private WashingIO io;
+
 
     public SpinController(WashingIO io) {
         // TODO
+        this.io = io;
     }
 
     @Override
@@ -29,6 +32,16 @@ public class SpinController extends ActorThread<WashingMessage> {
                 // if m is null, it means a minute passed and no message was received
                 if (m != null) {
                     System.out.println("got " + m);
+
+                    switch (m.order()){
+                        case SPIN_OFF:
+                            break;
+                        case SPIN_SLOW:
+                            break;
+                        case SPIN_FAST:
+                            break;
+
+                    }
                 }
 
                 // ... TODO ...

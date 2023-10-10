@@ -1,12 +1,13 @@
 package wash.control;
 
+import actor.ActorThread;
 import wash.io.WashingIO;
 import wash.simulation.WashingSimulator;
 
 import static wash.control.WashingMessage.Order.*;
 
 public class Wash {
-
+    private static ActorThread<WashingMessage> currentProgram;
     public static void main(String[] args) throws InterruptedException {
         WashingSimulator sim = new WashingSimulator(Settings.SPEEDUP);
 
@@ -23,32 +24,29 @@ public class Wash {
         while (true) {
             int n = io.awaitButton();
             System.out.println("user selected program " + n);
+            // if the user presses buttons 1-3, start a washing program
+            // if the user presses button 0, and a program has been started, stop it
             switch (n){
                 case 0:
-                    //TODO Något knas här, kopierat från prog 3 error handling
-                    //Program.interrupt();
-
-                    temp.interrupt();
-                    water.interrupt();
-                    spin.interrupt();
-
+                    if(currentProgram != null){
+                        currentProgram.interrupt();
+                        currentProgram = null; //Reset currentProgram
+                    }
                     System.out.println("washing program terminated");
                     break;
                 case 1:
-                    //Prog 1
-                    //Program = new WashingProgram1();
+                    currentProgram = new WashingProgram1(io, temp, water, spin);
+                    currentProgram.start();
                     break;
                 case 2:
-                    //Prog 2
+                    currentProgram = new WashingProgram2(io, temp, water, spin);
+                    currentProgram.start();
                     break;
                 case 3:
-                    WashingProgram3 washingProgram3 = new WashingProgram3(io, temp, water, spin);
-                    washingProgram3.start();
+                    currentProgram = new WashingProgram3(io, temp, water, spin);
+                    currentProgram.start();
                     break;
             }
-            // TODO:
-            // if the user presses buttons 1-3, start a washing program
-            // if the user presses button 0, and a program has been started, stop it
         }
     }
 };
