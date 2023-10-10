@@ -26,9 +26,7 @@ public class Wash {
             switch (n){
                 case 0:
                     //TODO Något knas här, kopierat från prog 3 error handling
-                    temp.send(new WashingMessage(this, TEMP_IDLE));
-                    water.send(new WashingMessage(this, WATER_IDLE));
-                    spin.send(new WashingMessage(this, SPIN_OFF));
+                    //Program.interrupt();
 
                     temp.interrupt();
                     water.interrupt();
@@ -38,6 +36,7 @@ public class Wash {
                     break;
                 case 1:
                     //Prog 1
+                    //Program = new WashingProgram1();
                     break;
                 case 2:
                     //Prog 2
