@@ -16,8 +16,8 @@ public class WaterController extends ActorThread<WashingMessage> {
     //void drain(boolean on);
     private WashingIO io;
     private double currentWaterLevel = 0;
-    private enum Mode{FILL, DRAIN, OFF};
-    private Mode mode;
+    private enum waterState {FILL, DRAIN, IDLE};
+    private waterState waterState;
     private ActorThread<WashingMessage> sender;
 
 
@@ -25,7 +25,7 @@ public class WaterController extends ActorThread<WashingMessage> {
         // TODO
         this.io = io;
         sender = null;
-        mode = Mode.OFF;
+        waterState = waterState.IDLE;
     }
 
     @Override
@@ -38,31 +38,37 @@ public class WaterController extends ActorThread<WashingMessage> {
                         System.out.println("got " + m);
                         switch (m.order()) {
                             case WATER_FILL:
-                                mode = Mode.FILL;
+                                waterState = waterState.FILL;
                                 sender = m.sender();
                                 break;
                             case WATER_DRAIN:
-                                mode = Mode.DRAIN;
+                                waterState = waterState.DRAIN;
                                 sender = m.sender();
                                 break;
                             case WATER_IDLE:
-                                mode = Mode.OFF;
+                                waterState = waterState.IDLE;
                                 break;
                         }
                     }
                     currentWaterLevel = io.getWaterLevel();
 
-                    if(mode == Mode.FILL){
+                    if(waterState == waterState.FILL){
                         if(currentWaterLevel < 10.0){
                             io.fill(true);
                         } else if(currentWaterLevel >= 10.0){
                             io.fill(false);
                             sender.send(new WashingMessage(this,ACKNOWLEDGMENT));
-                            mode = Mode.OFF;
+                            waterState = waterState.IDLE;
                         }
-                    } else if (mode == Mode.DRAIN){
-                        if(currentWaterLevel > 0) io.drain(true);
-                    } else if (mode == Mode.OFF){
+                    } else if (waterState == waterState.DRAIN){
+                        if(currentWaterLevel > 0){
+                            io.drain(true);
+                        } else {
+                            io.drain(false);
+                            sender.send(new WashingMessage(this, ACKNOWLEDGMENT));
+                            waterState = waterState.IDLE;
+                        }
+                    } else if (waterState == waterState.IDLE){
                         io.fill(false);
                         io.drain(false);
                         if(m != null){

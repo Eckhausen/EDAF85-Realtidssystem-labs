@@ -12,6 +12,8 @@ public class TemperatureController extends ActorThread<WashingMessage> {
     private WashingIO io;
     private boolean heaterOn = false;
     private ActorThread<WashingMessage> sender;
+    final double upperMargin = 0.678;
+    final double lowerMargin = 0.2952;
 
     public TemperatureController(WashingIO io) {
         // TODO
@@ -33,7 +35,7 @@ public class TemperatureController extends ActorThread<WashingMessage> {
         // TODO
         try {
             while(true){
-                WashingMessage m = receiveWithTimeout(1000 / Settings.SPEEDUP);
+                WashingMessage m = receiveWithTimeout(10000 / Settings.SPEEDUP);
                 if (m != null) {
                     System.out.println("got " + m);
 
@@ -48,6 +50,7 @@ public class TemperatureController extends ActorThread<WashingMessage> {
                             break;
                         case TEMP_IDLE:
                             selectedTemp = 0;
+                            sender.send(new WashingMessage(this, TEMP_IDLE));
                             break;
                     }
                 }
@@ -55,19 +58,19 @@ public class TemperatureController extends ActorThread<WashingMessage> {
                 currentTemp = io.getTemperature();
 
                 if (selectedTemp == 40) {
-                    if (currentTemp < 38.2 && !heaterOn) {
+                    if ((currentTemp - lowerMargin) < 38.2 && !heaterOn) {
                         io.heat(true);
                         heaterOn = true;
-                    } else if (currentTemp >= 39.8 && heaterOn) { //Vi ligger i intervallet
+                    } else if ((currentTemp + upperMargin) >= 39.8 && heaterOn) { //Vi ligger i intervallet
                         io.heat(false);
                         heaterOn = false;
                         sender.send(new WashingMessage(this,ACKNOWLEDGMENT));
                     }
                 } else if (selectedTemp == 60) {
-                    if (currentTemp < 58.2 && !heaterOn) {
+                    if ((currentTemp - lowerMargin) < 58.2 && !heaterOn) {
                         io.heat(true);
                         heaterOn = true;
-                    } else if (currentTemp >= 59.8 && heaterOn) { //Vi ligger i intervallet
+                    } else if ((currentTemp + upperMargin) >= 59.8 && heaterOn) { //Vi ligger i intervallet
                         io.heat(false);
                         heaterOn = false;
                         sender.send(new WashingMessage(this,ACKNOWLEDGMENT));
@@ -75,14 +78,10 @@ public class TemperatureController extends ActorThread<WashingMessage> {
                 } else if (selectedTemp == 0){
                     io.heat(false);
                     heaterOn = false;
-                    if(m != null){
-                        m.sender().send(new WashingMessage(this, ACKNOWLEDGMENT));
-                    }
-                    //m.sender().send(new WashingMessage(this, WashingMessage.Order.ACKNOWLEDGMENT));
+
                 }
 
             }
-
         } catch (InterruptedException unexpected) {
             throw new RuntimeException(unexpected);
         }
