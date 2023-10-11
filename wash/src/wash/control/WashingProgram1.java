@@ -30,10 +30,10 @@ public class WashingProgram1 extends ActorThread<WashingMessage> {
             // Lock the hatch
             io.lock(true);
 
-            // Let water in
+            // Fill with water
             water.send(new WashingMessage(this, WATER_FILL));
-            WashingMessage waterfilled = receive();
-            System.out.println("got " + waterfilled);
+            WashingMessage waterFilled = receive();
+            System.out.println("got " + waterFilled);
 
             // Heat to 40C and start spin
             temp.send(new WashingMessage(this, TEMP_SET_40));
@@ -47,7 +47,7 @@ public class WashingProgram1 extends ActorThread<WashingMessage> {
             WashingMessage tempIdle = receive();
             System.out.println("got " + tempIdle);
 
-            // Drain
+            // Drain the water
             water.send(new WashingMessage(this, WATER_DRAIN));
             WashingMessage draining = receive();
             System.out.println("got " + draining);
