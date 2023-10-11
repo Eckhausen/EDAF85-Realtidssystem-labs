@@ -1,89 +1,73 @@
 package wash.control;
 
-import actor.ActorThread;
-import wash.io.WashingIO;
 import static wash.control.WashingMessage.Order.*;
 
+import actor.ActorThread;
+import wash.io.WashingIO;
 
 public class TemperatureController extends ActorThread<WashingMessage> {
 
-    // TODO: add attributes
-    private double selectedTemp, currentTemp;
     private WashingIO io;
-    private boolean heaterOn = false;
+    private int upperBound;
+    private int lowerBound;
+    private final double upperMargin = 0.678;
+    private final double lowerMargin = 0.2952;
+    private boolean idle;
     private ActorThread<WashingMessage> sender;
-    final double upperMargin = 0.678;
-    final double lowerMargin = 0.2952;
+    private boolean startingUp;
 
-    public TemperatureController(WashingIO io) {
-        // TODO
+    public TemperatureController(WashingIO io) throws InterruptedException {
         this.io = io;
-        sender = null;
+        this.lowerBound = 0;
+        this.upperBound = 0;
+        this.idle = true;
+        this.sender = null;
+        this.startingUp = false;
     }
 
-    //I WashingIO:
-    //getTemperature()
-    //heat()
-    //
-    //I WashingMessage:
-    //TEMP_IDLE
-    //TEMP_SET_40
-    //TEMP_SET_60
-    //ACKNOWLEDGEMENT
     @Override
     public void run() {
-        // TODO
         try {
-            while(true){
+            while (true) {
                 WashingMessage m = receiveWithTimeout(10000 / Settings.SPEEDUP);
-                if (m != null) {
-                    System.out.println("got " + m);
 
+                if (m != null) {
+                    sender = m.sender();
                     switch (m.order()) {
+                        case TEMP_IDLE:
+                            io.heat(false);
+                            idle = true;
+                            sender.send(new WashingMessage(this, ACKNOWLEDGMENT));
+                            break;
                         case TEMP_SET_40:
-                            selectedTemp = 40;
-                            sender = m.sender();
+                            startingUp = true;
+                            idle = false;
+                            upperBound = 40;
+                            lowerBound = 38;
+                            io.heat(true);
                             break;
                         case TEMP_SET_60:
-                            selectedTemp = 60;
-                            sender = m.sender();
+                            startingUp = true;
+                            idle = false;
+                            upperBound = 60;
+                            lowerBound = 58;
+                            io.heat(true);
                             break;
-                        case TEMP_IDLE:
-                            selectedTemp = 0;
-                            sender.send(new WashingMessage(this, TEMP_IDLE));
+                        default:
                             break;
                     }
                 }
-
-                currentTemp = io.getTemperature();
-
-                if (selectedTemp == 40) {
-                    if ((currentTemp - lowerMargin) < 38.2 && !heaterOn) {
-                        io.heat(true);
-                        heaterOn = true;
-                    } else if ((currentTemp + upperMargin) >= 39.8 && heaterOn) { //Vi ligger i intervallet
-                        io.heat(false);
-                        heaterOn = false;
-                        sender.send(new WashingMessage(this,ACKNOWLEDGMENT));
-                    }
-                } else if (selectedTemp == 60) {
-                    if ((currentTemp - lowerMargin) < 58.2 && !heaterOn) {
-                        io.heat(true);
-                        heaterOn = true;
-                    } else if ((currentTemp + upperMargin) >= 59.8 && heaterOn) { //Vi ligger i intervallet
-                        io.heat(false);
-                        heaterOn = false;
-                        sender.send(new WashingMessage(this,ACKNOWLEDGMENT));
-                    }
-                } else if (selectedTemp == 0){
+                if ((io.getTemperature() + upperMargin >= upperBound) && !idle) {
                     io.heat(false);
-                    heaterOn = false;
-
+                    if (startingUp) {
+                        sender.send(new WashingMessage(this, ACKNOWLEDGMENT));
+                        startingUp = false;
+                    }
                 }
-
+                if ((io.getTemperature() - lowerMargin <= lowerBound) && !idle) {
+                    io.heat(true);
+                }
             }
-        } catch (InterruptedException unexpected) {
-            throw new RuntimeException(unexpected);
-        }
+        } catch (InterruptedException e) {}
     }
 }
