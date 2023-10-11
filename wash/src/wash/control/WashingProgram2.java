@@ -25,6 +25,11 @@ public class WashingProgram2 extends ActorThread<WashingMessage> {
 
     @Override
     public void run() {
+        /*
+        Program 2 (white wash): Like program 1, but with a 20 minute prewash in 40 ◦C. The main wash (30 min
+        utes) is to be performed in 60◦C. Between the prewash and the main wash, the water in the barrel is
+        drained and replaced with new, clean water.
+         */
         try {
             System.out.println("washing program 3 started");
 

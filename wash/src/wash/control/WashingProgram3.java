@@ -34,6 +34,11 @@ public class WashingProgram3 extends ActorThread<WashingMessage> {
     
     @Override
     public void run() {
+        /*
+        Program 3 (draining): Turn off heating and rotation, drain the barrel of water, and unlock the hatch.
+        Note: the user is expected to select this program as soon as possible after interrupting an ongoing
+        washing program with program 0 (stop).
+         */
         try {
             System.out.println("washing program 3 started");
             
